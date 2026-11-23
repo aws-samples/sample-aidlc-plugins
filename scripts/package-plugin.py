@@ -10,8 +10,8 @@ the harness directory can turn a new project brownfield or enter the reverse-eng
 
   aidlc-<p>-<v>-claude.zip    .claude/aidlc-plugins/<p>/
   aidlc-<p>-<v>-codex.zip     .codex/aidlc-plugins/<p>/
-  aidlc-<p>-<v>-kiro-ide.zip  .kiro/aidlc-plugins/<p>/  + .kiro/hooks/aidlc-<p>-compose.json
-  aidlc-<p>-<v>-kiro.zip      .kiro/aidlc-plugins/<p>/
+  aidlc-<p>-<v>-kiro.zip      .kiro/aidlc-plugins/<p>/  + .kiro/hooks/aidlc-<p>-compose.json
+  aidlc-<p>-<v>-kiro-v2.zip   .kiro/aidlc-plugins/<p>/
   aidlc-<p>-<v>-opencode.zip  .aidlc/aidlc-plugins/<p>/   (opencode's engine directory is .aidlc/)
 
 Each plugin folder holds the builder's projection, the plugin's `prerequisites/`, an INSTALL.md
@@ -20,8 +20,12 @@ made from `install/<claude-code|codex|kiro|opencode>.md` and a REMOVE.md made fr
 the plugin's `prerequisites/requires.json` (`scripts/prereqs.py`). The builder reads neither
 `prerequisites/` nor `install/`, so this script adds them.
 
+Harness names are the ones a person types after `aidlc config --harness` (2.11.4, upstream #2924):
+`kiro` is Kiro IDE and Kiro CLI v3 (harness id `kiro-ide`), `kiro-v2` is Kiro CLI V2 (id `kiro`).
+The documents in a zip name the id, because that is what the project's harness.json records.
+
 usage: package-plugin.py --tools <dir with aidlc-plugin-build.ts> --out <dir>
-                         [--harness claude,codex,kiro-ide,kiro,opencode] [--plain-name] <plugin-root>...
+                         [--harness claude,codex,kiro,kiro-v2,opencode] [--plain-name] <plugin-root>...
 
 --plain-name drops the harness from the file name (`aidlc-<p>-<v>.zip`) for a distribution that
 ships one harness only; it needs exactly one --harness.
@@ -39,17 +43,17 @@ from pathlib import Path
 import prereqs
 
 REPO = Path(__file__).resolve().parent.parent
-HARNESSES = ("claude", "codex", "kiro-ide", "kiro", "opencode")
-# harness → (harness directory, install template, product name for the template)
+HARNESSES = ("claude", "codex", "kiro", "kiro-v2", "opencode")
+# harness → (harness directory, install template, product name for the template, harness id)
 TARGETS = {
-    "claude": (".claude", "claude-code.md", "Claude Code"),
-    "codex": (".codex", "codex.md", "Codex"),
-    "kiro-ide": (".kiro", "kiro.md", "Kiro IDE and Kiro CLI v3"),
-    "kiro": (".kiro", "kiro.md", "Kiro CLI V2"),
-    "opencode": (".aidlc", "opencode.md", "opencode"),
+    "claude": (".claude", "claude-code.md", "Claude Code", "claude"),
+    "codex": (".codex", "codex.md", "Codex", "codex"),
+    "kiro": (".kiro", "kiro.md", "Kiro IDE and Kiro CLI v3", "kiro-ide"),
+    "kiro-v2": (".kiro", "kiro.md", "Kiro CLI V2", "kiro"),
+    "opencode": (".aidlc", "opencode.md", "opencode", "opencode"),
 }
 REMOVE_TEMPLATES = {"claude": "remove-claude-code.md", "codex": "remove-codex.md",
-                    "kiro-ide": "remove-kiro.md", "kiro": "remove-kiro.md",
+                    "kiro": "remove-kiro.md", "kiro-v2": "remove-kiro.md",
                     "opencode": "remove-opencode.md"}
 
 
@@ -63,7 +67,7 @@ def bun(args: list[str]) -> subprocess.CompletedProcess:
 
     No shell: the command is an argument list, and its first element is bun's absolute path. Every
     other argument is a fixed tool file name under --tools, a path this script resolved itself, or a
-    harness id checked against TARGETS, so no part of it is taken from untrusted input.
+    harness name checked against TARGETS, so no part of it is taken from untrusted input.
     """
     exe = shutil.which("bun")
     if not exe:
@@ -79,16 +83,18 @@ def run(args: list[str]) -> None:
 
 
 def build(tools: Path, root: Path, harness: str, out: Path) -> None:
-    """Run the builder of `tools` for one harness id (the id a project's harness.json records).
+    """Run the builder of `tools` for one harness of this script.
 
     From 2.11.4 the builder takes the name a person types: `kiro` builds Kiro (id `kiro-ide`) and
-    Kiro CLI V2 is `kiro-v2` (upstream #2924). Earlier builders know only `kiro` for V2 and refuse
-    `kiro-v2`, so the V2 build asks for `kiro-v2` first and falls back to `kiro` on that refusal.
+    Kiro CLI V2 is `kiro-v2` (upstream #2924); it still reads `kiro-ide` as that id. Earlier builders
+    read ids only: `kiro-ide`, and `kiro` for V2, refusing `kiro-v2`. So the Kiro build asks for
+    `kiro-ide` on every release, and the V2 build asks for `kiro-v2` first and falls back to `kiro`
+    on that refusal.
     """
     if harness not in TARGETS:
         sys.exit(f"unknown harness: {harness}")
-    cmd = [str(tools / "aidlc-plugin-build.ts"), str(root), harness, str(out)]
-    if harness == "kiro":
+    cmd = [str(tools / "aidlc-plugin-build.ts"), str(root), TARGETS[harness][3], str(out)]
+    if harness == "kiro-v2":
         cmd[2] = "kiro-v2"
         done = bun(cmd)
         if done.returncode == 0:
@@ -158,7 +164,7 @@ def render_doc(template: str, root: Path, harness: str, name: str, version: str,
                req: dict | None) -> str:
     product = TARGETS[harness][2]
     text = (REPO / "install" / template).read_text(encoding="utf-8")
-    values = {"HARNESS": harness, "PRODUCT": product, "ZIP": zip_file,
+    values = {"HARNESS": TARGETS[harness][3], "PRODUCT": product, "ZIP": zip_file,
               "RUNNER_EXCLUDES": runner_excludes(root) if harness == "codex" else "",
               "PERSONA_EXCLUDES": persona_excludes(root) if harness == "opencode" else "",
               "REQUIRES_SUMMARY": requires_summary(req, harness, root)}
@@ -182,10 +188,10 @@ def stage(root: Path, harness: str, tools: Path, work: Path, zip_file: str) -> P
         # Check which Kiro it was built for: a Kiro IDE hook in a V2 zip, or none in a Kiro zip,
         # means the builder read the harness name differently from this script.
         hook = built / ".kiro" / "hooks" / f"aidlc-{name}-compose.json"
-        if harness == "kiro-ide" and not hook.is_file():
-            sys.exit(f"kiro-ide: projection has no .kiro/hooks/{hook.name}: not a Kiro IDE build")
-        if harness == "kiro" and (built / ".kiro" / "hooks").exists():
-            sys.exit("kiro: projection has .kiro/hooks/: a Kiro IDE build, not Kiro CLI V2")
+        if harness == "kiro" and not hook.is_file():
+            sys.exit(f"kiro: projection has no .kiro/hooks/{hook.name}: not a Kiro IDE build")
+        if harness == "kiro-v2" and (built / ".kiro" / "hooks").exists():
+            sys.exit("kiro-v2: projection has .kiro/hooks/: a Kiro IDE build, not Kiro CLI V2")
         shutil.copytree(built / ".kiro", tree / ".kiro")
     else:
         shutil.copytree(built, tree / hd / "aidlc-plugins" / name)

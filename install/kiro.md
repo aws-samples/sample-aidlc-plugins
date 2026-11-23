@@ -37,7 +37,8 @@ aidlc doctor 2>&1 | tail -1        # note the problem count
 
 - Not `{{HARNESS}}`: this zip is for the `{{HARNESS}}` harness ({{PRODUCT}}). AI-DLC has two Kiro
   harnesses and they need different builds: `kiro-ide` for Kiro IDE and for Kiro CLI on its v3
-  engine, `kiro` for Kiro CLI on its V2 engine. Stop and tell the person which build matches the
+  engine (zip `aidlc-{{PLUGIN}}-{{VERSION}}-kiro.zip`), `kiro` for Kiro CLI on its V2 engine (zip
+  `aidlc-{{PLUGIN}}-{{VERSION}}-kiro-v2.zip`). Stop and tell the person which build matches the
   harness `aidlc config` set up for this project. (From 2.11.4, `aidlc config --harness kiro` sets
   up `kiro-ide` and `--harness kiro-v2` sets up `kiro`; harness.json keeps these names.)
 - `aidlc` not found: stop and say so.
@@ -143,13 +144,13 @@ doctor: <before> → <after> problems
 
 Then tell the person what happens next:
 
-<!-- harness: kiro-ide -->
+<!-- harness: kiro -->
 - The zip also placed `.kiro/hooks/aidlc-{{PLUGIN}}-compose.json`. That hook runs the same sync when
   a session starts, on its first prompt, so a newer zip unzipped over this one is picked up by
   itself. In Kiro IDE, reload the window (`Developer: Reload Window`) so Kiro sees any new skills; in
   Kiro CLI, start `kiro-cli` again.
 <!-- /harness -->
-<!-- harness: kiro -->
+<!-- harness: kiro-v2 -->
 - There is no hook on this harness. After unzipping a newer version, run Step 2 again, then start
   `kiro-cli --v2` again so it sees any new skills.
 <!-- /harness -->

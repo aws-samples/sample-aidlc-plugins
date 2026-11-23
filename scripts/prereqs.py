@@ -13,7 +13,8 @@ commands outright instead of asking the AI to work them out. This module does th
   bundled ones copied from the zip.
 - `{{MCP:<group>}}` becomes the steps that register every MCP server of that group the way this
   harness does it.
-- `<!-- harness: kiro-ide kiro -->` ... `<!-- /harness -->` keeps a block only in those harnesses.
+- `<!-- harness: kiro kiro-v2 -->` ... `<!-- /harness -->` keeps a block only in those harnesses
+  (`package-plugin.py`'s names: `kiro` = Kiro IDE and Kiro CLI v3, `kiro-v2` = Kiro CLI V2).
 - `{{H}}`, `{{S}}`, `{{HARNESS_LABEL}}`, `{{PLUGIN}}`, `{{VERSION}}` are replaced.
 
 requires.json, version 1:
@@ -34,8 +35,8 @@ from pathlib import Path
 HARNESS_INFO = {
     "claude": {"H": ".claude", "S": ".claude/skills", "label": "Claude Code"},
     "codex": {"H": ".codex", "S": ".agents/skills", "label": "Codex"},
-    "kiro-ide": {"H": ".kiro", "S": ".kiro/skills", "label": "Kiro IDE and Kiro CLI v3"},
-    "kiro": {"H": ".kiro", "S": ".kiro/skills", "label": "Kiro CLI V2"},
+    "kiro": {"H": ".kiro", "S": ".kiro/skills", "label": "Kiro IDE and Kiro CLI v3"},
+    "kiro-v2": {"H": ".kiro", "S": ".kiro/skills", "label": "Kiro CLI V2"},
     "opencode": {"H": ".aidlc", "S": ".aidlc/skills", "label": "opencode"},
 }
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
@@ -251,7 +252,7 @@ def _mcp_block(req: dict, group: str, harness: str, plugin: str) -> str:
                 "(`Blocked by a permission rule … Source: kiro-scope`). That is deliberate: do not get around",
                 "it with another tool.",
             ]
-            if harness == "kiro-ide":
+            if harness == "kiro":
                 out += [
                     "Without `kiro-cli` (Kiro IDE only): read the file; create it as `{\"mcpServers\": {}}` if it",
                     "is missing; add the one key and change nothing else. If the write is refused, show the",
@@ -267,8 +268,8 @@ def _mcp_block(req: dict, group: str, harness: str, plugin: str) -> str:
     where = {
         "claude": None,
         "codex": "`.codex/config.toml`",
-        "kiro-ide": "`.kiro/settings/mcp.json`",
         "kiro": "`.kiro/settings/mcp.json`",
+        "kiro-v2": "`.kiro/settings/mcp.json`",
         "opencode": "`opencode.json`",
     }[harness]
     if where:
@@ -280,7 +281,7 @@ def _mcp_block(req: dict, group: str, harness: str, plugin: str) -> str:
             "",
         ]
     names = [m["name"] for m in servers]
-    if harness == "kiro-ide":
+    if harness == "kiro":
         out += [
             "AI-DLC's agents see the server on their own: every AI-DLC agent file sets",
             "`includeMcpJson: true`. Never edit `.kiro/agents/aidlc*`. Check:",
@@ -296,7 +297,7 @@ def _mcp_block(req: dict, group: str, harness: str, plugin: str) -> str:
             "`task` tool. Never edit `.opencode/agents/aidlc*`.",
             "",
         ]
-    elif harness == "kiro":
+    elif harness == "kiro-v2":
         out += [
             "Then let AI-DLC's agents see it. On Kiro CLI V2, `aidlc config` writes `\"@<server>\"` into every",
             "AI-DLC agent JSON for each server in `mcp.json`. Run it once, after the servers above:",
@@ -319,7 +320,7 @@ def _mcp_block(req: dict, group: str, harness: str, plugin: str) -> str:
     return "\n".join(out)
 
 
-HARNESS_BLOCK = re.compile(r"<!-- harness: ([a-z -]+) -->\n(.*?)<!-- /harness -->\n?", re.S)
+HARNESS_BLOCK = re.compile(r"<!-- harness: ([a-z0-9 -]+) -->\n(.*?)<!-- /harness -->\n?", re.S)
 DIRECTIVE = re.compile(r"^\{\{(SKILLS|MCP):([a-z0-9-]+)\}\}$", re.M)
 
 
