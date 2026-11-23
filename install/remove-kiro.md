@@ -135,8 +135,9 @@ Then tell the person:
   Kiro's file explorer), before the next session: its command points at the deleted plugin folder
   and fails at every session start. Then `aidlc doctor` shows the Step 1 problem count again.
 <!-- /harness -->
-- When `.kiro/settings/mcp.json` now reads `{"mcpServers": {}}` and nothing else: delete that file
-  too (the agent cannot write there). Skip this line when it still lists a server.
+- When `.kiro/settings/mcp.json` now reads `{"mcpServers": {}}` and nothing else, and the install
+  record lists it under `files_created`: delete that file too (the agent cannot write there). If
+  the record does not list it, leave it: it was there before the install. Skip this line when it still lists a server.
 - This project now has an explicit plugin list (`select` keeps one once it has been set). A plugin
   installed later with its own INSTALL.md adds itself to that list.
 - If doctor warns `Hook failures … review-freeze … "State file not found"`: in a project with no

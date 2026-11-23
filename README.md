@@ -9,7 +9,7 @@ takes the plugin out again.
 
 | Plugin | What it shows |
 |---|---|
-| `visual-mockups` | Prose added to three existing stages: the mockup stages offer an HTML preview (or a Figma file) and carry it into code generation |
+| `visual-mockups` | Prose added to three existing stages: the mockup stages offer an HTML preview (or a Figma file; HTML only on opencode) and carry it into code generation |
 | `ua-plugin` | Reverse engineering starts from an [Understand-Anything](https://github.com/Egonex-AI/Understand-Anything) code map, through a shipped converter tool and a rules file |
 | `graphify-plugin` | The same for a [Graphify](https://github.com/Graphify-Labs/graphify) graph; an alternative to `ua-plugin`, not a layer on it |
 | `project-overview` | Four new stages, one at the end of each phase, that keep one project overview up to date |
@@ -23,29 +23,38 @@ is not part of AI-DLC or an AWS service.
 
 - AI-DLC 2.11.4 installed (`aidlc --version`) and set up in your project with `aidlc config`, for
   one of: Claude Code, Codex, Kiro (Kiro IDE, or Kiro CLI on its v3 or V2 engine), or opencode.
-- To build the zips: [bun](https://bun.sh), Python 3 and [uv](https://docs.astral.sh/uv/).
+- Only to build the zips yourself instead of downloading them: [bun](https://bun.sh), Python 3 and
+  [uv](https://docs.astral.sh/uv/).
 - `ua-plugin` and `graphify-plugin` need bun at run time, and the code-map tool itself, which you
   install and run yourself.
 
 ## Use
 
-Build the zips with the plugin tools of your AI-DLC install (`<project>/<harness directory>/tools`,
-for example `.claude/tools`), unzip the one for your tool at the project root, and give your AI
-one line:
+1. Download the zip for your plugin and tool from the
+   [latest release](https://github.com/aws-samples/sample-aidlc-plugins/releases/latest). Its name
+   is `aidlc-<plugin>-<plugin version>-<suffix>.zip`; the suffix is the harness name you give
+   `aidlc config --harness`: `claude`, `codex`, `kiro` (Kiro IDE and Kiro CLI v3), `kiro-v2`
+   (Kiro CLI V2) or `opencode`.
+2. Unzip it at the root of your AI-DLC project (not inside `.claude/` or another harness folder;
+   the zip brings that folder itself):
 
-```bash
-uv run python scripts/package-plugin.py --tools <project>/.claude/tools --out dist visual-mockups
-cd <project> && unzip <path>/dist/aidlc-visual-mockups-<version>-claude.zip
-```
+   ```bash
+   cd <project> && unzip ~/Downloads/aidlc-visual-mockups-0.3.0-claude.zip
+   ```
 
-```
-Read .claude/aidlc-plugins/visual-mockups/INSTALL.md to the end and follow it.
-```
+3. Give your AI the one line for your tool from the
+   [table under "Distribute"](#distribute--a-zip-per-tool-one-prompt-to-install), on Claude Code:
 
-The zip suffix is the harness name you give `aidlc config --harness`: `claude`, `codex`, `kiro`
-(Kiro IDE and Kiro CLI v3), `kiro-v2` (Kiro CLI V2) and `opencode`. The folder it lands in, and the line to give, are listed under
-"Distribute" below. To take a plugin out: `Read <harness directory>/aidlc-plugins/<plugin>/REMOVE.md
-to the end and follow it.`
+   ```
+   Read .claude/aidlc-plugins/visual-mockups/INSTALL.md to the end and follow it.
+   ```
+
+Keep the unzipped folder: `REMOVE.md` is in it, and the install record is written beside it. To take
+the plugin out, give the same line with `REMOVE.md` in place of `INSTALL.md`. With the `kiro` zip,
+delete `.kiro/hooks/aidlc-<plugin>-compose.json` yourself afterwards, as `REMOVE.md` says.
+
+To build the zips yourself from this repository, see "Distribute" below; you need the plugin tools
+of your AI-DLC install (`<project>/<harness directory>/tools`, for example `.claude/tools`).
 
 ---
 
@@ -132,17 +141,17 @@ documents inside name the id, which is what `harness.json` records. For a
 distribution that ships one harness only, `--harness <h> --plain-name` names the zip
 `aidlc-<p>-<v>.zip`; its INSTALL.md names that file.
 
-Each zip carries three documents written for its harness: `INSTALL.md` (from `install/<tool>.md`), `prerequisites/INSTALL.md` and `REMOVE.md` (from `install/remove-<tool>.md`). `scripts/prereqs.py` fills them from the plugin's need list `prerequisites/requires.json` (skills, pinned to a commit and tree hash when fetched, and MCP entries) and keeps only the `<!-- harness: … -->` blocks for that harness. The install writes a record, `<H>/aidlc-plugins/<p>.install-record.json`, of each skill, server and line it `installed`, `added` or found `already present`; `REMOVE.md` deletes only the first two kinds. The person keeps the unzipped folder: the record and `REMOVE.md` live beside it, and teammates install from it.
+Each zip carries documents written for its harness: `INSTALL.md` (from `install/<tool>.md`) and `REMOVE.md` (from `install/remove-<tool>.md`) in the plugin folder, and `prerequisites/INSTALL.md` for the plugins that have prerequisites (`visual-mockups`, `ua-plugin`, `graphify-plugin`). `scripts/prereqs.py` fills them from the plugin's need list `prerequisites/requires.json` (skills, pinned to a commit and tree hash when fetched, and MCP entries) and keeps only the `<!-- harness: … -->` blocks for that harness. The install writes a record, `<H>/aidlc-plugins/<p>.install-record.json`, of each skill, server and line it `installed`, `added` or found `already present`; `REMOVE.md` deletes only the first two kinds. The person keeps the unzipped folder: `REMOVE.md` is inside it, the record is written beside it, and teammates install from it.
 
 The four tools install differently, and `install/` holds one procedure for each:
 
 | | Claude Code (`install/claude-code.md`) | Codex (`install/codex.md`) | Kiro: `kiro` and `kiro-v2` zips (`install/kiro.md`) | opencode (`install/opencode.md`) |
 |---|---|---|---|---|
 | install | copy to `<config>/aidlc-plugins/<p>/`, local marketplace, `claude plugin install --scope local` | copy to `$CODEX_HOME/aidlc-plugins/<p>/`, `codex plugin add` — **for the user, every project** | none — the plugin stays in `.kiro/aidlc-plugins/<p>/` | none — the plugin stays in `.aidlc/aidlc-plugins/<p>/` |
-| compose | the AI runs `aidlc engine plugin sync`; the plugin's SessionStart hook after that | same; plugin hooks run in interactive `codex`, not in `codex exec` | the AI runs sync with `AIDLC_PLUGIN_ROOT`; Kiro IDE's compose hook after that, Kiro CLI has none | the AI runs `sync --harness-dir .aidlc --plugin-root <folder>`; no hook, so again after an upgrade |
+| compose | the AI runs `aidlc engine plugin sync`; the plugin's SessionStart hook after that | same; plugin hooks run in interactive `codex`, not in `codex exec` | the AI runs sync with `AIDLC_PLUGIN_ROOT`; the compose hook after that in the `kiro` zip (Kiro IDE and Kiro CLI v3); the `kiro-v2` zip has none | the AI runs `sync --harness-dir .aidlc --plugin-root <folder>`; no hook, so again after an upgrade |
 | skills / MCP | `.claude/skills/` · `claude mcp add --scope local` | `.agents/skills/` + an `exclude` line in `.aidlc-source-paths.json` · `.codex/config.toml` | `.kiro/skills/` · `kiro-cli mcp add --scope workspace` (Kiro IDE without `kiro-cli`: `.kiro/settings/mcp.json`) | `.aidlc/skills/` · `"mcp"` in the project-root `opencode.json`; a plugin's agents in `.opencode/agents/` get an `exclude` line |
 | unzipped folder afterwards | **keep** | **keep** | **keep** | **keep** |
-| remove | `REMOVE.md`: `claude plugin uninstall --scope local`, then `sync --prune-missing --yes` | `REMOVE.md`: this project only → `select`; every project → `codex plugin remove`, then prune in each | `REMOVE.md`: `select` the kept plugins, delete `plugin-owned` files, `graph compile`; the person deletes the Kiro IDE hook json | `REMOVE.md`: as on Kiro, with no hook json; opencode asks the person before each `rm -r…` |
+| remove | `REMOVE.md`: `claude plugin uninstall --scope local`, then `sync --prune-missing --yes` | `REMOVE.md`: this project only → `select`; every project → `codex plugin remove`, then prune in each | `REMOVE.md`: `select` the kept plugins, delete `plugin-owned` files, `graph compile`; with the `kiro` zip, the person deletes the hook json | `REMOVE.md`: as on Kiro, with no hook json; opencode asks the person before each `rm -r…` |
 
 🔴 **Nothing may land outside the harness directory or the user's tool config.** Measured on 2.11.2:
 a folder at the project root with a `tests/` directory or a `.ts` file turns a new project
@@ -269,21 +278,21 @@ Measured 2026-10-26 on AI-DLC v2.11.1 (claude and kiro-ide trees packaged from t
 
 ## What has been tested
 
-On AI-DLC 2.11.4, an AI installed each plugin from its zip into a new project by following
-`INSTALL.md`, and then removed it again by following `REMOVE.md`, on these tools:
+Before publication, on AI-DLC 2.11.4, an AI installed each plugin from its zip into a new project by
+following `INSTALL.md`, and then removed it again by following `REMOVE.md`, on these tools:
 
-| Tool | AI-DLC harness | Measured on |
-|---|---|---|
-| Claude Code | `claude` | macOS |
-| Codex | `codex` | macOS |
-| Kiro CLI on its v3 engine | `kiro-ide` (Kiro IDE and Kiro CLI v3) | macOS |
-| Kiro CLI on its V2 engine | `kiro` | macOS |
-| opencode 1.19.5 | `opencode` | Linux (Amazon Linux 2023) |
+| Tool | Zip suffix | Harness id in `harness.json` | Measured on |
+|---|---|---|---|
+| Claude Code | `claude` | `claude` | macOS |
+| Codex | `codex` | `codex` | macOS |
+| Kiro CLI on its v3 engine | `kiro` (Kiro IDE and Kiro CLI v3) | `kiro-ide` | macOS |
+| Kiro CLI on its V2 engine | `kiro-v2` | `kiro` | macOS |
+| opencode 1.19.5 | `opencode` | `opencode` | Linux (Amazon Linux 2023) |
 
 After each install: the compose dropped nothing, every fragment landed, `aidlc doctor` showed no
 new problem, the project stayed greenfield, and AI-DLC's source scans were unchanged apart from the
 documented exceptions above. After each removal only the project's explicit plugin selection was
-left (on Kiro IDE, after the person deletes the compose hook file).
+left (with the `kiro` zip, after the person deletes the compose hook file).
 
 Not tested: the Kiro IDE window itself (its harness was driven through Kiro CLI v3), Windows,
 Cursor, GitHub Copilot, OpenCode 2, and the plugins' behaviour across a whole AI-DLC workflow on
@@ -295,4 +304,4 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 ## License
 
-This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
+This sample is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.

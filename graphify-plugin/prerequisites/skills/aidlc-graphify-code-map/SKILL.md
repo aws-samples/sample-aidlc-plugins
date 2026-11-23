@@ -143,7 +143,7 @@ bun --version                                                   # the converter 
 bun <harness-dir>/tools/graphify-map.ts <repo-a> [<repo-b> ...] --workspace . --space <active-space>
 ```
 
-`<harness-dir>` is `.kiro`, `.claude` or `.codex`, whichever holds `aidlc-common/`. graphify-plugin installed
+`<harness-dir>` is `.kiro`, `.claude`, `.codex` or `.aidlc` (opencode), whichever holds `aidlc-common/`. graphify-plugin installed
 the converter there; if `<harness-dir>/tools/graphify-map.ts` is missing, the plugin is not composed
 — say so and stop. `<active-space>` is the space named in `aidlc/active-space`; the converter writes
 to `default` when `--space` is omitted, so always pass it. When `bun --version` fails, tell the user
