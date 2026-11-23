@@ -148,11 +148,14 @@ and nothing that was there before:
   "selection_added": false,
   "skills": [{"name": "<name>", "path": "<path>", "source": "<repo>@<commit> | bundled", "status": "installed | already present"}],
   "mcp": [{"name": "<name>", "where": "<file, or claude mcp local scope>", "status": "added | already present"}],
-  "lines": [{"file": "<file>", "added": "<the exact line or entry>"}]
+  "lines": [{"file": "<file>", "added": "<the exact line or entry>"}],
+  "files_created": ["<a file this install created>"]
 }
 ```
 
-Use empty lists for what this plugin did not touch. Read the file back and check it is valid JSON.
+Use empty lists for what this plugin did not touch. `files_created` lists only files that did not
+exist when this install first wrote to them (check before that first write); `REMOVE.md` deletes an
+emptied file only when it is listed there. Read the file back and check it is valid JSON.
 
 ### Step 9 — verify
 

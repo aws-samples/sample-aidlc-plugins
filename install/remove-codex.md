@@ -91,8 +91,9 @@ For each entry with status `installed` or `added`:
   the file back.
 - **A line:** remove exactly that line or entry from its file (`.aidlc-source-paths.json`,
   `.gitignore`), and read the file back. When `.aidlc-source-paths.json` is then down to
-  `"version"` and an empty `"exclude"` list (no `"paths"`, no other entry), delete the whole file:
-  an empty one was not there before the install.
+  `"version"` and an empty `"exclude"` list (no `"paths"`, no other entry), delete the whole file
+  only when the install record lists it under `files_created`; otherwise leave it (it was there
+  before the install, or the record is older than `files_created`) and say so in the report.
 
 ### Step 4 — the record and this folder
 
