@@ -420,13 +420,13 @@ function developerSlice(repo: string, g: Dict | null, s: Dict | null, cross: [st
 /** A flow's summary cut to its first sentence, and to FLOW_SUMMARY_MAX characters as a guard, so a
  * summary with no sentence break cannot turn the flow list into prose. Measured on a 59-flow Korean
  * map: rows average ~420 bytes and none reached the cap, so the list costs ~25 KB at that size. A cut
- * is marked with "…"; the full text is in `domain-graph.json`. Table pipes are escaped so a summary
- * cannot break the row. */
+ * is marked with "…"; the full text is in `domain-graph.json`. Backslashes, then table pipes, are
+ * escaped so a summary cannot break the row. */
 const FLOW_SUMMARY_MAX = 160;
 function firstSentence(s: string): string {
   const one = s.split(/(?<=[.!?。])\s/)[0].trim().replace(/\s+/g, " ");
   const cut = one.length > FLOW_SUMMARY_MAX ? `${one.slice(0, FLOW_SUMMARY_MAX).trimEnd()}…` : one;
-  return cut.replace(/\|/g, "\\|");
+  return cut.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
 }
 
 /** `/understand-domain` output. Nodes are three tiers — `domain` > `flow` > `step` (measured).
