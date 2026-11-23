@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "skills": [
+    {"name": "aidlc-graphify-code-map", "group": "skill", "bundled": "skills/aidlc-graphify-code-map"}
+  ],
+  "mcp": []
+}

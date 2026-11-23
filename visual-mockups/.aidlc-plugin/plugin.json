@@ -1,0 +1,17 @@
+{
+  "name": "visual-mockups",
+  "version": "0.3.0",
+  "description": "Give the mockup stages a visual surface and carry the mockup into code. At rough/refined-mockups, offer to render the approved wireframes either into Figma (a file the customer views and edits in the browser) OR into a self-contained HTML preview — or neither (markdown only), the user's choice. Persist a single visual pointer (visual-mockups-ref, type figma|html; the refined round writes visual-mockups-ref-refined) and, at code-generation, feed both that visual ref AND the mockup markdown to UI units. Additive: no new stages, contributions to rough-mockups (Ideation), refined-mockups (Inception), and code-generation (Construction) only. A plugin cannot carry skills or MCP servers, so prerequisites/INSTALL.md is a procedure the AI follows after the plugin is composed: the HTML path needs nothing (its design rules ship as knowledge for the design agent); the Figma path needs the `figma` MCP server, Figma's own skills (fetched from Figma's repository, not bundled) and a paid Figma plan. The plugin wires WHERE/WHEN in the AI-DLC workflow, not HOW to drive Figma.",
+  "author": {
+    "name": "Amazon Web Services"
+  },
+  "dependencies": [
+    "core"
+  ],
+  "aidlc": {
+    "contributes": {
+      "overlays": "contributions/",
+      "knowledge": "knowledge/"
+    }
+  }
+}

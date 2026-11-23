@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "skills": [
+    {"name": "aidlc-ua-code-map", "group": "skill", "bundled": "skills/aidlc-ua-code-map"}
+  ],
+  "mcp": []
+}

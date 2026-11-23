@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": [
+    {"name": "figma-use", "group": "figma",
+     "fetch": {"repo": "https://github.com/figma/mcp-server-guide", "commit": "5f3024c3decd83ff6f0bfb3ef36a2c4cfbff961d",
+               "path": "skills/figma-use", "tree": "3771fa2e7246e42528c8ad38ef198d414354a52d"}},
+    {"name": "figma-generate-design", "group": "figma",
+     "fetch": {"repo": "https://github.com/figma/mcp-server-guide", "commit": "5f3024c3decd83ff6f0bfb3ef36a2c4cfbff961d",
+               "path": "skills/figma-generate-design", "tree": "f8050b4af0269bd7ef0916e67685af478d8d75fa"}},
+    {"name": "figma-create-new-file", "group": "figma",
+     "fetch": {"repo": "https://github.com/figma/mcp-server-guide", "commit": "5f3024c3decd83ff6f0bfb3ef36a2c4cfbff961d",
+               "path": "skills/figma-create-new-file", "tree": "eb73eadb18d4547d819dc8d8ba581a4646c4d80d"}}
+  ],
+  "mcp": [
+    {"name": "figma", "group": "figma", "url": "https://mcp.figma.com/mcp"}
+  ]
+}
