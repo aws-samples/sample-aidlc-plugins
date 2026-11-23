@@ -1,0 +1,16 @@
+{
+  "name": "ua-plugin",
+  "version": "0.5.2",
+  "description": "Let reverse-engineering start from external structural maps instead of a cold scan, in single- and multi-repo workspaces. When a repo the intent scans carries a finished Understand-Anything map under <repo>/.ua/ — or one workspace map under .ua/ at the root covers several repos — the converter turns it into per-repo knowledge files (the repo name is in every file name and heading), the Developer code scan uses that repo's map as an INDEX for deciding which files to open, and every borrowed claim is confirmed in the source file before it reaches a CodeKB artifact. Overlay-only: two contributions to reverse-engineering (Inception), the converter tool (tools/ua-code-map.ts), and the shared rules file (knowledge/aidlc-shared/external-code-map.md) that every inline and delegated agent loads. The map is evidence, never truth, and never replaces reverse-engineering. Conditional throughout: with no map present nothing here asks for one.",
+  "author": {
+    "name": "Amazon Web Services"
+  },
+  "dependencies": ["core"],
+  "aidlc": {
+    "contributes": {
+      "overlays": "contributions/",
+      "knowledge": "knowledge/",
+      "tools": "tools/"
+    }
+  }
+}

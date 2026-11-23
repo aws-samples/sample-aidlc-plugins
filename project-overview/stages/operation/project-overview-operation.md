@@ -1,0 +1,134 @@
+---
+slug: project-overview-operation
+name: Project Overview — Operation
+plugin: project-overview
+phase: operation
+execution: CONDITIONAL
+condition: Execute at the end of Operation whenever the project-overview plugin is composed and any Operation stage ran in this intent.
+lead_agent: project-overview-curator-agent
+support_agents: []
+mode: inline
+produces:
+  - project-overview-operation-snapshot
+consumes:
+  - artifact: deployment-strategy
+    required: false
+  - artifact: environment-inventory
+    required: false
+  - artifact: deployment-log
+    required: false
+  - artifact: health-check-report
+    required: false
+  - artifact: slo-config
+    required: false
+  - artifact: runbooks
+    required: false
+  - artifact: incident-plan
+    required: false
+  - artifact: load-test-results
+    required: false
+  - artifact: nfr-validation-matrix
+    required: false
+  - artifact: slo-report
+    required: false
+  - artifact: cost-analysis
+    required: false
+requires_stage:
+  - deployment-pipeline
+  - environment-provisioning
+  - deployment-execution
+  - observability-setup
+  - incident-response
+  - performance-validation
+  - feedback-optimization
+sensors:
+  - required-sections
+scopes:
+  - bugfix
+  - enterprise
+  - express
+  - feature
+  - infra
+  - refactor
+  - security-patch
+  - workshop
+inputs: This intent's Operation artifacts and the space's published project overview
+outputs: project-overview-operation-snapshot.md (under this stage's record dir, engine-resolved), the published overview at aidlc/spaces/<active-space>/knowledge/documents/project-overview/project-overview.md, and its digest at aidlc/spaces/<active-space>/knowledge/aidlc-shared/project-overview.md
+---
+
+# Project Overview — Operation
+
+MANDATORY: Follow stage-protocol.md for approval gates, question format, and completion messages.
+
+This stage runs once, after every other Operation stage. It folds how the
+project is deployed, observed and run — environments, deployment strategy,
+SLOs, runbooks, incident plan, performance and cost results — into the space's
+cumulative project overview.
+
+The method is in the curator's methodology knowledge, `overview-method.md`: the
+template, which sections Operation owns, the merge rules, and the publish
+procedure. Follow it exactly; this file does not restate it.
+
+## Steps
+
+### Step 1: Load the Current Overview
+
+Resolve `<active-space>` as `overview-method.md` § Where it lives describes.
+If the published overview exists, read it and keep the text you read (merge
+rule 1). If it does not, start from the template. Read
+`aidlc/spaces/<active-space>/intents/intents.json` for this intent's slug and
+scope.
+
+### Step 2: Read This Phase's Artifacts
+
+Read each consumed artifact that exists in this intent's record. Every input is
+optional — a stage the scope skipped simply has none.
+
+### Step 3: Write the Snapshot
+
+Write `project-overview-operation-snapshot.md`: the whole overview after this
+update. Rewrite only the sections the table in `overview-method.md` gives to
+**operation**, carry every other section forward unchanged, append to Decision
+Log and Intent History, and end with `## Sources`.
+
+### Step 4: Publish and Index
+
+Follow `overview-method.md` § Publish and index, including the concurrent-intent
+check before writing.
+
+### Step 5: Completion Handoff
+
+Hand completion to `stage-protocol.md` via
+`aidlc engine orchestrate report --stage project-overview-operation --result <outcome>`.
+That `report` call owns every lifecycle transition and advancement; never perform one in prose, and never narrate this bookkeeping to the user.
+The protocol fixes the order: announce and summarise first, run the learnings
+ritual when the directive lists it, and only then open the gate with
+`--result awaiting-approval` and ask the approval question.
+
+### Step 6: Present Completion & Request Approval
+
+Completion emoji: :compass:
+Review paths: the snapshot in this stage's engine-resolved record dir, the
+published overview, and its digest (both already in place — say so).
+Standard 2-option approval (Approve / Request Changes).
+STOP for the human response. Report Approve with
+`--result approved --user-input "<exact choice>"`; report
+Request Changes with `--result rejected --user-input "Request Changes"` (the
+engine records the human's own words from this chat as the feedback; when it
+kept none, pass what they asked for in `--reason`), revise the snapshot,
+publish and index again, then report `--result revised` before re-presenting.
+
+## Sensors
+
+The snapshot is a markdown artefact under this stage's record dir. The imported
+`required-sections` sensor checks it has the template's H2 structure; a team
+that wants the exact heading set enforced can drop the template as
+`aidlc/spaces/<space>/memory/templates/project-overview-operation-snapshot.md`.
+
+## Learn
+
+When `directive.protocol_modules` lists `learnings`, follow
+`stage-protocol-learnings.md`: keep the diary at `directive.memory_path` while
+working and run the ritual before the approval gate, applying its bootstrap,
+`single: true`, per-unit, and gate-revision exemptions. When the module is absent,
+skip both the diary and the ritual.

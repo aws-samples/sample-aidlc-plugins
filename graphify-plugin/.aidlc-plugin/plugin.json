@@ -1,0 +1,18 @@
+{
+  "name": "graphify-plugin",
+  "version": "0.2.6",
+  "description": "Let reverse-engineering start from external structural maps instead of a cold scan, in single- and multi-repo workspaces, where each map is built by Graphify (https://github.com/Graphify-Labs/graphify), which writes one under <repo>/graphify-out/. This plugin tells the Developer code scan to use it as an INDEX for deciding which files to open, and — because Graphify tags every edge EXTRACTED or INFERRED — lets the duty to confirm every borrowed claim in the source file be spent where it is actually needed. Overlay-only: two fragments in reverse-engineering (Inception), the converter tool (tools/graphify-map.ts) that turns each repo's map into per-repo knowledge files (the repo name is in every file name and heading), and the shared rules file (knowledge/aidlc-shared/external-code-map.md) that every inline and delegated agent loads. The map is evidence, never truth, and it never replaces reverse-engineering — that stage still owns the CodeKB store, whose freshness fingerprint only the tool can mint. Conditional throughout: with no map present nothing here asks for one and its absence is not a gap. A tree takes exactly one code-map plugin: ua-plugin is the alternative.",
+  "author": {
+    "name": "Amazon Web Services"
+  },
+  "dependencies": [
+    "core"
+  ],
+  "aidlc": {
+    "contributes": {
+      "overlays": "contributions/",
+      "knowledge": "knowledge/",
+      "tools": "tools/"
+    }
+  }
+}
