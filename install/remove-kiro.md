@@ -66,7 +66,7 @@ Delete every file listed under `files` (`path`, relative to the project), then t
 rm .kiro/tools/data/plugin-compose-{{PLUGIN}}.json .kiro/tools/data/plugin-files-{{PLUGIN}}.json .kiro/tools/data/plugin-owned-{{PLUGIN}}.json
 ```
 
-<!-- harness: kiro-ide -->
+<!-- harness: kiro -->
 Leave `.kiro/hooks/aidlc-{{PLUGIN}}-compose.json` to the person and do not try to delete it:
 AI-DLC's guard refuses an agent's delete under `.kiro/hooks/` (measured on 2.11.4 with Kiro CLI
 3.2.0). Step 7 asks the person to delete it. Until they do, doctor reports one problem more than
@@ -91,7 +91,7 @@ For each entry with status `installed` or `added`:
   IDE only): remove that one key from the file; if the write is refused, show the person the key.
   When the file then reads `{"mcpServers": {}}` and nothing else, Step 7 asks the person to delete
   it (you cannot write under `.kiro/settings/`).
-<!-- harness: kiro -->
+<!-- harness: kiro-v2 -->
   The AI-DLC agent JSONs keep their `"@<name>"` grant. Leave it: `aidlc config` never drops a
   grant an agent file already names (a teammate's server stays granted), and Kiro CLI V2 ignores a
   grant for a server it does not have (both measured on 2.11.4). Do not run `aidlc config` for it.
@@ -111,7 +111,7 @@ AIDLC_HARNESS_DIR=.kiro aidlc engine plugin select   # {{PLUGIN}} is not known
 aidlc engine graph compile --check                   # prints nothing
 aidlc doctor 2>&1 | tail -1                          # same problem count as Step 1
 ```
-<!-- harness: kiro-ide -->
+<!-- harness: kiro -->
 
 On this harness doctor shows one problem more than in Step 1 until the person deletes the compose
 hook (Step 3). Any other new problem: show it.
@@ -130,7 +130,7 @@ doctor: <before> → <after> problems
 
 Then tell the person:
 
-<!-- harness: kiro-ide -->
+<!-- harness: kiro -->
 - **Delete `.kiro/hooks/aidlc-{{PLUGIN}}-compose.json` yourself**, outside the agent (a terminal or
   Kiro's file explorer), before the next session: its command points at the deleted plugin folder
   and fails at every session start. Then `aidlc doctor` shows the Step 1 problem count again.
@@ -142,10 +142,10 @@ Then tell the person:
 - If doctor warns `Hook failures … review-freeze … "State file not found"`: in a project with no
   intent, AI-DLC's review-freeze hook records one for each file the agent deletes. It is a warning,
   not a problem, and it clears 24 hours after the last one.
-<!-- harness: kiro-ide -->
+<!-- harness: kiro -->
 - In Kiro IDE, reload the window (`Developer: Reload Window`); in Kiro CLI, start `kiro-cli` again.
 <!-- /harness -->
-<!-- harness: kiro -->
+<!-- harness: kiro-v2 -->
 - Start `kiro-cli --v2` again.
 <!-- /harness -->
 

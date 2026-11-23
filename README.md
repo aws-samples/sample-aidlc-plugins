@@ -42,8 +42,8 @@ cd <project> && unzip <path>/dist/aidlc-visual-mockups-<version>-claude.zip
 Read .claude/aidlc-plugins/visual-mockups/INSTALL.md to the end and follow it.
 ```
 
-The zip suffix names the AI-DLC harness: `claude`, `codex`, `kiro-ide` (Kiro IDE and Kiro CLI v3),
-`kiro` (Kiro CLI V2) and `opencode`. The folder it lands in, and the line to give, are listed under
+The zip suffix is the harness name you give `aidlc config --harness`: `claude`, `codex`, `kiro`
+(Kiro IDE and Kiro CLI v3), `kiro-v2` (Kiro CLI V2) and `opencode`. The folder it lands in, and the line to give, are listed under
 "Distribute" below. To take a plugin out: `Read <harness directory>/aidlc-plugins/<plugin>/REMOVE.md
 to the end and follow it.`
 
@@ -122,11 +122,13 @@ uv run python scripts/package-plugin.py --tools <tools-dir> \
 |---|---|---|
 | `aidlc-<p>-<v>-claude.zip` | `.claude/aidlc-plugins/<p>/` | `Read .claude/aidlc-plugins/<p>/INSTALL.md to the end and follow it.` |
 | `aidlc-<p>-<v>-codex.zip` | `.codex/aidlc-plugins/<p>/` | `Read .codex/aidlc-plugins/<p>/INSTALL.md to the end and follow it.` |
-| `aidlc-<p>-<v>-kiro-ide.zip` — Kiro IDE, and Kiro CLI on its v3 engine | `.kiro/aidlc-plugins/<p>/` + `.kiro/hooks/aidlc-<p>-compose.json` | `Read .kiro/aidlc-plugins/<p>/INSTALL.md to the end and follow it.` |
-| `aidlc-<p>-<v>-kiro.zip` — Kiro CLI on its V2 engine | `.kiro/aidlc-plugins/<p>/` | same |
+| `aidlc-<p>-<v>-kiro.zip` — Kiro IDE, and Kiro CLI on its v3 engine | `.kiro/aidlc-plugins/<p>/` + `.kiro/hooks/aidlc-<p>-compose.json` | `Read .kiro/aidlc-plugins/<p>/INSTALL.md to the end and follow it.` |
+| `aidlc-<p>-<v>-kiro-v2.zip` — Kiro CLI on its V2 engine | `.kiro/aidlc-plugins/<p>/` | same |
 | `aidlc-<p>-<v>-opencode.zip` | `.aidlc/aidlc-plugins/<p>/` (opencode's engine directory is `.aidlc/`) | `Read .aidlc/aidlc-plugins/<p>/INSTALL.md to the end and follow it.` |
 
-The suffix is the AI-DLC harness, not the tool: `kiro-ide` serves Kiro IDE and Kiro CLI v3. For a
+The suffix is the harness name a person types after `aidlc config --harness` (2.11.4+): `kiro`
+serves Kiro IDE and Kiro CLI v3 (harness id `kiro-ide`), `kiro-v2` Kiro CLI V2 (id `kiro`). The
+documents inside name the id, which is what `harness.json` records. For a
 distribution that ships one harness only, `--harness <h> --plain-name` names the zip
 `aidlc-<p>-<v>.zip`; its INSTALL.md names that file.
 
@@ -134,7 +136,7 @@ Each zip carries three documents written for its harness: `INSTALL.md` (from `in
 
 The four tools install differently, and `install/` holds one procedure for each:
 
-| | Claude Code (`install/claude-code.md`) | Codex (`install/codex.md`) | Kiro: `kiro-ide` and `kiro` harnesses (`install/kiro.md`) | opencode (`install/opencode.md`) |
+| | Claude Code (`install/claude-code.md`) | Codex (`install/codex.md`) | Kiro: `kiro` and `kiro-v2` zips (`install/kiro.md`) | opencode (`install/opencode.md`) |
 |---|---|---|---|---|
 | install | copy to `<config>/aidlc-plugins/<p>/`, local marketplace, `claude plugin install --scope local` | copy to `$CODEX_HOME/aidlc-plugins/<p>/`, `codex plugin add` — **for the user, every project** | none — the plugin stays in `.kiro/aidlc-plugins/<p>/` | none — the plugin stays in `.aidlc/aidlc-plugins/<p>/` |
 | compose | the AI runs `aidlc engine plugin sync`; the plugin's SessionStart hook after that | same; plugin hooks run in interactive `codex`, not in `codex exec` | the AI runs sync with `AIDLC_PLUGIN_ROOT`; Kiro IDE's compose hook after that, Kiro CLI has none | the AI runs `sync --harness-dir .aidlc --plugin-root <folder>`; no hook, so again after an upgrade |

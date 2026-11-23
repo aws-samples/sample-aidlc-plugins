@@ -42,7 +42,7 @@ All four files must be listed. If any is missing, the plugin is not composed yet
 
 ### Step 2 — ask about Figma
 
-<!-- harness: claude codex kiro-ide kiro -->
+<!-- harness: claude codex kiro kiro-v2 -->
 Ask the person whether to prepare the Figma path as well. HTML needs nothing more.
 
 - **Yes:** say first that Figma needs a Dev or Full seat on a paid Figma plan, and that by using the
@@ -99,7 +99,7 @@ Report each one. Remove none of them yourself.
 - **A stage file naming `mockup-visual-ref`:** 0.1.0 was composed into this tree and its
   `produces`/`consumes` are still in that stage's frontmatter. The fix is in `../README.md`
   ("Upgrading from 0.1.0"); tell the person, do not edit the stage file.
-<!-- harness: kiro-ide kiro -->
+<!-- harness: kiro kiro-v2 -->
 - **`"@figma"` added by hand to `.kiro/agents/aidlc*`** (what an older version of this procedure
   asked for): the next `aidlc config` stops with `locally modified or unowned` on those files. Tell
   the person to run `aidlc config --project-dir "<project>" --dry-run`; when the conflict list names
@@ -131,12 +131,12 @@ Then tell the person what is left for them when they chose Figma:
 <!-- harness: codex -->
 - Restart Codex, then run `codex mcp login figma` to authorize.
 <!-- /harness -->
-<!-- harness: kiro-ide -->
+<!-- harness: kiro -->
 - Kiro IDE: run `Developer: Reload Window` and check in the MCP panel that `figma` is connected and
   authorized. Kiro CLI v3: restart `kiro-cli`, then authorize `figma` when it asks (`/mcp`).
 - Each Figma call asks for approval first. That is AI-DLC's default, not a fault.
 <!-- /harness -->
-<!-- harness: kiro -->
+<!-- harness: kiro-v2 -->
 - Restart `kiro-cli --v2`, then authorize `figma` when it asks (`/mcp`).
 - Each Figma call asks for approval first. That is AI-DLC's default, not a fault.
 <!-- /harness -->
