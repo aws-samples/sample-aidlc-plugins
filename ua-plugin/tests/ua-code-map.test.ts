@@ -162,6 +162,21 @@ test("a long flow summary is cut and marked, a pipe cannot break the row", () =>
   expect(row?.length ?? 0).toBeLessThan(260);
 });
 
+test("a backslash before a pipe in a flow summary cannot break the row", () => {
+  // `a\|b` written as `a\\|b` would leave the pipe unescaped in Markdown (CodeQL js/incomplete-sanitization).
+  const ws = workspace("flows-backslash");
+  const dir = repo(ws, "f");
+  const dg = join(dir, ".ua", "domain-graph.json");
+  const g = JSON.parse(readFileSync(dg, "utf-8"));
+  g.nodes[1].summary = "a\\|b c\\d.";
+  writeFileSync(dg, JSON.stringify(g));
+  expect(run(dir, "--workspace", ws, "--space", "s1").status).toBe(0);
+  const row = readFileSync(K(ws, "aidlc-product-agent", "ua-domains.f.md"), "utf-8")
+    .split("\n")
+    .find((l) => l.startsWith("| **flow**"));
+  expect(row).toContain("a\\\\\\|b c\\\\d.");
+});
+
 test("two trees with the same repo name are refused", () => {
   const ws = workspace("dup");
   const one = repo(ws, "same");
